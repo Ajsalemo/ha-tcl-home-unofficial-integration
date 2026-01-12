@@ -1,4 +1,7 @@
+import logging
 from enum import StrEnum
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class DeviceTypeEnum(StrEnum):
@@ -13,12 +16,13 @@ class DeviceTypeEnum(StrEnum):
     AIR_PURIFIER_BREEVA_A5 = "Breeva A5"
 
 
-def is_split_ac_with_number(device_type:str)-> bool:
+def is_split_ac_with_number(device_type: str) -> bool:
     if device_type.lower().startswith("split ac-"):
         suffix = device_type[9:]
         if suffix.isdigit():
             return True
     return False
+
 
 def is_implemented_by_integration(device_type: str) -> bool:
     known_device_types = [
@@ -33,16 +37,17 @@ def is_implemented_by_integration(device_type: str) -> bool:
         "Breeva A3",
         "Breeva A5",
     ]
-    
+
     if is_split_ac_with_number(device_type):
         device_type = "Split AC-#"
-    
+
     if device_type.lower() in list(map(str.lower, known_device_types)):
         return True
     return False
 
 
 def calculateDeviceType(device_type: str) -> DeviceTypeEnum | None:
+    _LOGGER.info("Calculating device type for: %s", device_type)
     if device_type == "Portable AC":
         return DeviceTypeEnum.PORTABLE_AC
     elif device_type == "Dehumidifier DEM":
