@@ -57,8 +57,8 @@ def calculateDeviceType(device_type: str) -> DeviceTypeEnum | None:
         return DeviceTypeEnum.DUCT_AC
     elif device_type == "Split AC" or is_split_ac_with_number(device_type):
         return DeviceTypeEnum.SPLIT_AC
-    elif device_type == "Breeva A3":
+    elif device_type == "breeva A3":
         return DeviceTypeEnum.AIR_PURIFIER_BREEVA_A3
-    elif device_type == "Breeva A5":
+    elif device_type == "breeva A5":
         return DeviceTypeEnum.AIR_PURIFIER_BREEVA_A5
     return None

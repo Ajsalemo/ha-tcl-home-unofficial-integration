@@ -7,50 +7,37 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 
 from .const import DOMAIN
-from .device_enums import ModeEnum, DehumidifierModeEnum
+from .data_storage import (get_stored_data, safe_get_value, safe_set_value,
+                           set_stored_data)
 from .device_capabilities import DeviceCapabilityEnum, get_capabilities
-from .device_features import getSupportedFeatures, DeviceFeatureEnum
-from .tcl_device_portable_ac import (
-    TCL_PortableAC_DeviceData,
-    get_stored_portable_ac_data,
-    handle_portable_ac_mode_change,
-)
-from .tcl_device_spit_ac_fresh_air import (
-    TCL_SplitAC_Fresh_Air_DeviceData,
-    get_stored_spit_ac_fresh_data,
-    handle_split_ac_freshair_mode_change,
-)
-from .tcl_device_spit_ac import (
-    TCL_SplitAC_DeviceData,
-    get_stored_spit_ac_data,
-    handle_split_ac_mode_change,
-)
-from .tcl_device_window_ac import (
-    TCL_WindowAC_DeviceData,
-    get_stored_window_ac_data,
-    handle_window_ac_mode_change,
-)
-from .tcl_device_dehumidifier_dem import (
-    TCL_Dehumidifier_DEM_DeviceData,
-    get_stored_dehumidifier_dem_data,
-    handle_dehumidifier_dem_mode_change,
-)
-from .tcl_device_dehumidifier_df import (
-    TCL_Dehumidifier_DF_DeviceData,
-    get_stored_dehumidifier_df_data,
-    handle_dehumidifier_df_mode_change,
-)
-from .tcl_device_duct_ac import (
-    TCL_DuctAC_DeviceData,
-    get_stored_duct_ac_data,
-    handle_duct_ac_mode_change,
-)
-
-
-
+from .device_enums import DehumidifierModeEnum, ModeEnum
+from .device_features import DeviceFeatureEnum, getSupportedFeatures
 from .device_types import DeviceTypeEnum, calculateDeviceType
-from .data_storage import get_stored_data, safe_set_value, set_stored_data, safe_get_value
 from .tcl import GetThingsResponseData
+from .tcl_device_breeva_a5 import (TCL_BreevaA5_DeviceData,
+                                   get_stored_breeva_a5_data,
+                                   handle_breeva_a5_mode_change)
+from .tcl_device_dehumidifier_dem import (TCL_Dehumidifier_DEM_DeviceData,
+                                          get_stored_dehumidifier_dem_data,
+                                          handle_dehumidifier_dem_mode_change)
+from .tcl_device_dehumidifier_df import (TCL_Dehumidifier_DF_DeviceData,
+                                         get_stored_dehumidifier_df_data,
+                                         handle_dehumidifier_df_mode_change)
+from .tcl_device_duct_ac import (TCL_DuctAC_DeviceData,
+                                 get_stored_duct_ac_data,
+                                 handle_duct_ac_mode_change)
+from .tcl_device_portable_ac import (TCL_PortableAC_DeviceData,
+                                     get_stored_portable_ac_data,
+                                     handle_portable_ac_mode_change)
+from .tcl_device_spit_ac import (TCL_SplitAC_DeviceData,
+                                 get_stored_spit_ac_data,
+                                 handle_split_ac_mode_change)
+from .tcl_device_spit_ac_fresh_air import (
+    TCL_SplitAC_Fresh_Air_DeviceData, get_stored_spit_ac_fresh_data,
+    handle_split_ac_freshair_mode_change)
+from .tcl_device_window_ac import (TCL_WindowAC_DeviceData,
+                                   get_stored_window_ac_data,
+                                   handle_window_ac_mode_change)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -154,6 +141,12 @@ class Device:
                         aws_thing_state=aws_thing["state"]["reported"],
                         delta=aws_thing["state"].get("delta", {}),
                     )
+                case DeviceTypeEnum.AIR_PURIFIER_BREEVA_A5:
+                    self.data = TCL_BreevaA5_DeviceData(
+                        device_id=self.device_id,
+                        aws_thing_state=aws_thing["state"]["reported"],
+                        delta=aws_thing["state"].get("delta", {}),
+                    )
 
                 case _:
                     self.data = None
@@ -183,6 +176,7 @@ class Device:
         | TCL_Dehumidifier_DEM_DeviceData
         | TCL_Dehumidifier_DF_DeviceData
         | TCL_DuctAC_DeviceData
+        | TCL_BreevaA5_DeviceData
         | None
     ) = None
 
@@ -322,6 +316,8 @@ async def get_device_storage(hass: HomeAssistant, device: Device) -> None:
         return await get_stored_dehumidifier_dem_data(hass, device.device_id)
     elif device.device_type == DeviceTypeEnum.DEHUMIDIFIER_DF:
         return await get_stored_dehumidifier_df_data(hass, device.device_id)
+    elif device.device_type == DeviceTypeEnum.AIR_PURIFIER_BREEVA_A5:   
+        return await get_stored_breeva_a5_data(hass, device.device_id)
 
 
 def get_desired_state_for_mode_change(
@@ -372,6 +368,13 @@ def get_desired_state_for_mode_change(
         )
     elif device.device_type == DeviceTypeEnum.DEHUMIDIFIER_DF:
         desired_state = handle_dehumidifier_df_mode_change(
+            desired_state=desired_state,
+            value=value,
+            supported_features=device.supported_features,
+            stored_data=stored_data,
+        )
+    elif device.device_type == DeviceTypeEnum.AIR_PURIFIER_BREEVA_A5:   
+        desired_state = handle_breeva_a5_mode_change(
             desired_state=desired_state,
             value=value,
             supported_features=device.supported_features,
