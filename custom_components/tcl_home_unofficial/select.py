@@ -897,7 +897,7 @@ async def async_setup_entry(
         elif device.device_type == DeviceTypeEnum.AIR_PURIFIER_BREEVA_A3 or device.device_type == DeviceTypeEnum.AIR_PURIFIER_BREEVA_A5:
             if DeviceFeatureEnum.SELECT_WIND_SPEED in device.supported_features:
                 switches.append(
-                    SelectHandler(
+                    DynamicSelectHandler(
                         hass=hass,
                         coordinator=coordinator,
                         device=device,
