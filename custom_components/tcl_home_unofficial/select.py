@@ -12,16 +12,18 @@ from .coordinator import IotDeviceCoordinator
 from .data_storage import (get_stored_data, safe_get_value, safe_set_value,
                            set_stored_data)
 from .device import Device, get_desired_state_for_mode_change
-from .device_enums import (AirPurifierFanWindSpeedEnum, DehumidifierModeEnum,
-                           FreshAirEnum, GeneratorModeEnum,
-                           LeftAndRightAirSupplyVectorEnum, ModeEnum,
-                           PortableWind4ValueSeedEnum, PortableWindSeedEnum,
-                           SleepModeEnum, TemperatureTypeEnum,
-                           UpAndDownAirSupplyVectorEnum, WindFeelingEnum,
-                           WindowAcWindSeedEnum, WindSeed7GearEnum,
-                           WindSeedEnum, WindSpeedLowMediumHigh,
-                           getAirPurifierFanWindSpeed, getFreshAir,
-                           getGeneratorMode, getLeftAndRightAirSupplyVector,
+from .device_enums import (AirPurifierFanWindSpeedEnum,
+                           AirPurifierFanWindSpeedStrEnum,
+                           DehumidifierModeEnum, FreshAirEnum,
+                           GeneratorModeEnum, LeftAndRightAirSupplyVectorEnum,
+                           ModeEnum, PortableWind4ValueSeedEnum,
+                           PortableWindSeedEnum, SleepModeEnum,
+                           TemperatureTypeEnum, UpAndDownAirSupplyVectorEnum,
+                           WindFeelingEnum, WindowAcWindSeedEnum,
+                           WindSeed7GearEnum, WindSeedEnum,
+                           WindSpeedLowMediumHigh, getAirPurifierFanWindSpeed,
+                           getFreshAir, getGeneratorMode,
+                           getLeftAndRightAirSupplyVector,
                            getPortableWind4ValueSeed, getPortableWindSeed,
                            getSleepMode, getTemperatureType,
                            getUpAndDownAirSupplyVector, getWindFeeling,
@@ -815,6 +817,12 @@ def get_SELECT_WIND_SPEED_available_fn(device: Device) -> str:
     return mode != ModeEnum.DEHUMIDIFICATION
 
 
+def get_AIR_PURIFIER_BREEVA_FAN_WIND_SPEED_available_fn(device: Device) -> str:
+    _LOGGER.info("Checking work_mode for device %s: %s", device.device_id, device.data.work_mode)
+    mode = device.mode_value_to_enum_mapp.get(device.data.work_mode, AirPurifierFanWindSpeedStrEnum.AUTO)
+    return mode
+
+
 def get_SELECT_PORTABLE_WIND_SPEED_available_fn(device: Device) -> str:
     if DeviceFeatureEnum.MODE_AC_AUTO in device.supported_features:
         return device.data.sleep != 1
@@ -850,7 +858,7 @@ async def async_setup_entry(
     switches = []
     for device in config_entry.devices:
         _LOGGER.info(
-            "Device %s supported features: %s", device, device.supported_features
+            "Device %s supported features: %s", device.device_type, device.supported_features
         )
         if DeviceFeatureEnum.SELECT_MODE in device.supported_features:
             switches.append(
@@ -864,6 +872,24 @@ async def async_setup_entry(
                     icon_fn=lambda device: "mdi:set-none",
                 )
             )
+
+        # if DeviceFeatureEnum.AIR_PURIFIER_BREEVA_FAN_WIND_SPEED in device.supported_features:
+        #     switches.append(
+        #         SelectHandler(
+        #             hass=hass,
+        #             coordinator=coordinator,
+        #             device=device,
+        #             deviceFeature=DeviceFeatureEnum.AIR_PURIFIER_BREEVA_FAN_WIND_SPEED,
+        #             type="WindSpeed",
+        #             name="Wind Speed",
+        #             icon_fn=lambda device: "mdi:weather-windy",
+        #             options_values_fn=lambda device: [e.value for e in AirPurifierFanWindSpeedEnum],
+        #             available_fn=lambda device: get_AIR_PURIFIER_BREEVA_FAN_WIND_SPEED_available_fn(
+        #                 device
+        #             ),
+        #         )
+        #     )
+    
         if DeviceFeatureEnum.SELECT_WIND_SPEED in device.supported_features:
             switches.append(
                 DynamicSelectHandler(

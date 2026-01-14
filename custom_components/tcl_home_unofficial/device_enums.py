@@ -357,6 +357,13 @@ class AirPurifierFanWindSpeedEnum(StrEnum):
     AUTO = "0"
 
 
+class AirPurifierFanWindSpeedStrEnum(StrEnum):
+    LOW = "Low"
+    MEDIUM = "Medium"
+    HIGH = "High"
+    AUTO = "Auto"
+
+
 def getAirPurifierFanWindSpeed(windSpeed: int) -> AirPurifierFanWindSpeedEnum:
     match windSpeed:
         case 1:
