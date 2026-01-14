@@ -354,7 +354,6 @@ class AirPurifierFanWindSpeedEnum(StrEnum):
     LOW = "1"
     MEDIUM = "2"
     HIGH = "3"
-    AUTO = "0"
 
 
 class AirPurifierFanWindSpeedStrEnum(StrEnum):

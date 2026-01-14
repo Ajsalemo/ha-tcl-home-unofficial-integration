@@ -10,7 +10,8 @@ from .const import DOMAIN
 from .data_storage import (get_stored_data, safe_get_value, safe_set_value,
                            set_stored_data)
 from .device_capabilities import DeviceCapabilityEnum, get_capabilities
-from .device_enums import DehumidifierModeEnum, ModeEnum
+from .device_enums import (AirPurifierFanWindSpeedStrEnum,
+                           DehumidifierModeEnum, ModeEnum)
 from .device_features import DeviceFeatureEnum, getSupportedFeatures
 from .device_types import DeviceTypeEnum, calculateDeviceType
 from .tcl import GetThingsResponseData
@@ -256,8 +257,8 @@ class Device:
                 DeviceFeatureEnum.SELECT_WIND_SPEED
                 in self.supported_features
             ):
-                self.mode_enum_to_value_mapp[ModeEnum.AUTO] = 0
-                self.mode_value_to_enum_mapp[work_mode] = ModeEnum.AUTO
+                self.mode_enum_to_value_mapp[AirPurifierFanWindSpeedStrEnum.LOW] = 0
+                self.mode_value_to_enum_mapp[work_mode] = AirPurifierFanWindSpeedStrEnum.LOW
                 work_mode += 1
 
         if DeviceFeatureEnum.INTERNAL_IS_DEHUMIDIFIER in self.supported_features:
