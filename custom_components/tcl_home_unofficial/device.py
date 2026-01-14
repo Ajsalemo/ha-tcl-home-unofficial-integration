@@ -250,13 +250,15 @@ class Device:
             else:
                 self.mode_enum_to_value_mapp[ModeEnum.HEAT] = 0
 
-        if (
-            DeviceFeatureEnum.AIR_PURIFIER_BREEVA_FAN_WIND_SPEED
-            in self.supported_features
-        ):
-            self.mode_enum_to_value_mapp[ModeEnum.AUTO] = 0
-            self.mode_value_to_enum_mapp[work_mode] = ModeEnum.AUTO
-            work_mode += 1
+
+        if self.device_type == DeviceTypeEnum.AIR_PURIFIER_BREEVA_A3 or self.device_type == DeviceTypeEnum.AIR_PURIFIER_BREEVA_A5:
+            if (
+                DeviceFeatureEnum.SELECT_WIND_SPEED
+                in self.supported_features
+            ):
+                self.mode_enum_to_value_mapp[ModeEnum.AUTO] = 0
+                self.mode_value_to_enum_mapp[work_mode] = ModeEnum.AUTO
+                work_mode += 1
 
         if DeviceFeatureEnum.INTERNAL_IS_DEHUMIDIFIER in self.supported_features:
             if self.device_type == DeviceTypeEnum.DEHUMIDIFIER_DEM:

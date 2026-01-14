@@ -111,11 +111,14 @@ class DesiredStateHandlerForSelect:
                         self.device.data.work_mode, default_ac_mode
                     )
             case DeviceFeatureEnum.SELECT_WIND_SPEED:
-                return getWindSpeed(
-                    wind_speed=self.device.data.wind_speed,
-                    turbo=self.device.data.turbo,
-                    silence_switch=self.device.data.silence_switch,
-                )
+                if self.device.device_type == DeviceTypeEnum.AIR_PURIFIER_BREEVA_A3 or self.device.device_type == DeviceTypeEnum.AIR_PURIFIER_BREEVA_A5:
+                    return getAirPurifierFanWindSpeed(self.device.data.wind_speed)
+                else:
+                    return getWindSpeed(
+                        wind_speed=self.device.data.wind_speed,
+                        turbo=self.device.data.turbo,
+                        silence_switch=self.device.data.silence_switch,
+                    )
             case DeviceFeatureEnum.SELECT_DEHUMIDIFIER_WIND_SPEED_LOW_MEDIUM_HEIGH:
                 return getWindSpeedLowMediumHigh(self.device.data.wind_speed)
             case DeviceFeatureEnum.SELECT_WIND_SPEED_7_GEAR:
@@ -873,25 +876,8 @@ async def async_setup_entry(
                 )
             )
 
-        if device.device_type == DeviceTypeEnum.AIR_PURIFIER_BREEVA_A3 or device.device_type == DeviceTypeEnum.AIR_PURIFIER_BREEVA_A5:
-            if DeviceFeatureEnum.AIR_PURIFIER_BREEVA_FAN_WIND_SPEED in device.supported_features:
-                switches.append(
-                    SelectHandler(
-                        hass=hass,
-                        coordinator=coordinator,
-                        device=device,
-                        deviceFeature=DeviceFeatureEnum.AIR_PURIFIER_BREEVA_FAN_WIND_SPEED,
-                        type="WindSpeed",
-                        name="Wind Speed",
-                        icon_fn=lambda device: "mdi:weather-windy",
-                        options_values_fn=lambda device: [e.value for e in AirPurifierFanWindSpeedStrEnum],
-                        available_fn=lambda device: get_AIR_PURIFIER_BREEVA_FAN_WIND_SPEED_available_fn(
-                            device
-                        ),
-                    )
-                )
     
-        if device.device__type != DeviceTypeEnum.AIR_PURIFIER_BREEVA_A3 and device.device_type != DeviceTypeEnum.AIR_PURIFIER_BREEVA_A5:
+        if device.device_type != DeviceTypeEnum.AIR_PURIFIER_BREEVA_A3 and device.device_type != DeviceTypeEnum.AIR_PURIFIER_BREEVA_A5:
             if DeviceFeatureEnum.SELECT_WIND_SPEED in device.supported_features:
                 switches.append(
                     DynamicSelectHandler(
@@ -908,6 +894,24 @@ async def async_setup_entry(
                         ),
                     )
                 )
+        elif device.device_type == DeviceTypeEnum.AIR_PURIFIER_BREEVA_A3 or device.device_type == DeviceTypeEnum.AIR_PURIFIER_BREEVA_A5:
+            if DeviceFeatureEnum.SELECT_WIND_SPEED in device.supported_features:
+                switches.append(
+                    SelectHandler(
+                        hass=hass,
+                        coordinator=coordinator,
+                        device=device,
+                        deviceFeature=DeviceFeatureEnum.SELECT_WIND_SPEED,
+                        type="WindSpeed",
+                        name="Wind Speed",
+                        icon_fn=lambda device: "mdi:weather-windy",
+                        options_values_fn=lambda device: [e.value for e in AirPurifierFanWindSpeedStrEnum],
+                        available_fn=lambda device: get_AIR_PURIFIER_BREEVA_FAN_WIND_SPEED_available_fn(
+                            device
+                        ),
+                    )
+                )
+        
 
         if DeviceFeatureEnum.SELECT_WINDOW_AS_WIND_SPEED in device.supported_features:
             switches.append(
