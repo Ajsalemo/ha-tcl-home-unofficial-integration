@@ -369,9 +369,9 @@ def getAirPurifierFanWindSpeed(windSpeed: int) -> AirPurifierFanWindSpeedEnum:
     _LOGGER.info("Getting Air Purifier Fan Wind Speed for windSpeed: %s", windSpeed)
     match windSpeed:
         case 1:
-            return AirPurifierFanWindSpeedEnum.LOW
+            return AirPurifierFanWindSpeedStrEnum.LOW
         case 2:
-            return AirPurifierFanWindSpeedEnum.MEDIUM
+            return AirPurifierFanWindSpeedStrEnum.MEDIUM
         case 3:
-            return AirPurifierFanWindSpeedEnum.HIGH
-    return AirPurifierFanWindSpeedEnum.LOW
+            return AirPurifierFanWindSpeedStrEnum.HIGH
+    return AirPurifierFanWindSpeedStrEnum.LOW

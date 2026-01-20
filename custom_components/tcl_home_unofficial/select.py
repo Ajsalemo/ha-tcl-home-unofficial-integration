@@ -180,7 +180,10 @@ class DesiredStateHandlerForSelect:
             case DeviceFeatureEnum.SELECT_DEHUMIDIFIER_WIND_SPEED_LOW_MEDIUM_HEIGH:
                 return [e.value for e in WindSpeedLowMediumHigh]
             case DeviceFeatureEnum.SELECT_WIND_SPEED:
-                return [e.value for e in WindSeedEnum]
+                if self.device.device_type == DeviceTypeEnum.AIR_PURIFIER_BREEVA_A3 or self.device.device_type == DeviceTypeEnum.AIR_PURIFIER_BREEVA_A5:
+                    return [e.value for e in AirPurifierFanWindSpeedStrEnum]
+                else:
+                    return [e.value for e in WindSeedEnum]
             case DeviceFeatureEnum.SELECT_WIND_SPEED_7_GEAR:
                 return [e.value for e in WindSeed7GearEnum]
             case DeviceFeatureEnum.SELECT_PORTABLE_WIND_SPEED:
@@ -381,7 +384,7 @@ class DesiredStateHandlerForSelect:
         self, value: AirPurifierFanWindSpeedStrEnum
     ):
         stored_data = await get_stored_data(self.hass, self.device.device_id)
-        _LOGGER.info(" AIR_PURIFIER_BREEVA_FAN_WIND_SPEED - stored_data: %s", stored_data)
+        _LOGGER.info("AIR_PURIFIER_BREEVA_FAN_WIND_SPEED - stored_data: %s", stored_data)
         mode = self.device.mode_value_to_enum_mapp.get(
             self.device.data.work_mode, AirPurifierFanWindSpeedStrEnum.LOW
         )
