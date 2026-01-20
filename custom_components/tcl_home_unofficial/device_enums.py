@@ -387,3 +387,14 @@ def getAirPurifierFanWindSpeed(windSpeed: int) -> AirPurifierFanWindSpeedEnum:
         case 3:
             return AirPurifierFanWindSpeedStrEnum.HIGH
     return AirPurifierFanWindSpeedStrEnum.LOW
+
+
+def getAirPurifierWorkMode(workMode: int) -> AirPurifierWorkModeEnum:
+    match workMode:
+        case 0:
+            return AirPurifierWorkModeStrEnum.AUTO
+        case 1:
+            return AirPurifierWorkModeStrEnum.SLEEP
+        case 2:
+            return AirPurifierWorkModeStrEnum.FAN
+    return AirPurifierWorkModeStrEnum.AUTO
