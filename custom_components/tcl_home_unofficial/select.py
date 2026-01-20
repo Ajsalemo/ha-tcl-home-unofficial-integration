@@ -380,16 +380,16 @@ class DesiredStateHandlerForSelect:
     # set_desired_state is adding the wrong state
     # its  adding "AwsIot.set_desired_state: (CklBHTSAAAE) {'highTemperatureWind': 0, 'turbo': 0, 'silenceSwitch': 0, 'windSpeed': 6}"
     async def AIR_PURIFIER_BREEVA_FAN_WIND_SPEED(
-        self, value: AirPurifierFanWindSpeedEnum
+        self, value: AirPurifierFanWindSpeedStrEnum
     ):
         desired_state = {}
         _LOGGER.info("Setting AIR_PURIFIER_BREEVA_FAN_WIND_SPEED to %s", value)
         match value:
-            case AirPurifierFanWindSpeedEnum.LOW:
+            case AirPurifierFanWindSpeedStrEnum.LOW:
                 desired_state = {"windSpeed": 1}
-            case AirPurifierFanWindSpeedEnum.MEDIUM:
+            case AirPurifierFanWindSpeedStrEnum.MEDIUM:
                 desired_state = {"windSpeed": 2}
-            case AirPurifierFanWindSpeedEnum.HIGH:
+            case AirPurifierFanWindSpeedStrEnum.HIGH:
                 desired_state = {"windSpeed": 3}
         return await self.coordinator.get_aws_iot().async_set_desired_state(
             self.device.device_id, desired_state
