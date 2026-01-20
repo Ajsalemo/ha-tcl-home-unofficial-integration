@@ -360,9 +360,9 @@ class AirPurifierFanWindSpeedEnum(StrEnum):
 
 
 class AirPurifierWorkModeEnum(StrEnum):
-    LOW = "1"
-    MEDIUM = "2"
-    HIGH = "3"
+    AUTO = "0"
+    SLEEP = "1"
+    FAN = "2"
 
 
 class AirPurifierFanWindSpeedStrEnum(StrEnum):
