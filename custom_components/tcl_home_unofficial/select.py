@@ -380,6 +380,17 @@ class DesiredStateHandlerForSelect:
     async def AIR_PURIFIER_BREEVA_FAN_WIND_SPEED(
         self, value: AirPurifierFanWindSpeedStrEnum
     ):
+        stored_data = await get_stored_data(self.hass, self.device.device_id)
+        _LOGGER.info(" AIR_PURIFIER_BREEVA_FAN_WIND_SPEED - stored_data: %s", stored_data)
+        mode = self.device.mode_value_to_enum_mapp.get(
+            self.device.data.work_mode, AirPurifierFanWindSpeedStrEnum.LOW
+        )
+        stored_data, need_save = safe_set_value(
+            stored_data, "fan_speed." + mode + ".value", value, overwrite_if_exists=True
+        )
+        if need_save:
+            await set_stored_data(self.hass, self.device.device_id, stored_data)
+            
         desired_state = {}
         _LOGGER.info("Setting AIR_PURIFIER_BREEVA_FAN_WIND_SPEED to %s", value)
         match value:
