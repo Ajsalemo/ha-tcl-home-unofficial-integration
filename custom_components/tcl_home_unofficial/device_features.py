@@ -6,7 +6,6 @@ from enum import StrEnum
 from .device_capabilities import DeviceCapabilityEnum
 from .device_types import DeviceTypeEnum
 
-_LOGGER = logging.getLogger(__name__)
 
 class DeviceFeatureEnum(StrEnum):
     MODE_AC_AUTO = "mode.ac.auto"
