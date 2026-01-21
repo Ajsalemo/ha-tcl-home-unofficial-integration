@@ -6,21 +6,21 @@ from homeassistant.components.select import SelectEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .calculations import celsius_to_fahrenheit
 from .config_entry import New_NameConfigEntry
 from .coordinator import IotDeviceCoordinator
 from .data_storage import (get_stored_data, safe_get_value, safe_set_value,
                            set_stored_data)
 from .device import Device, get_desired_state_for_mode_change
 from .device_enums import (AirPurifierFanWindSpeedStrEnum,
-                           DehumidifierModeEnum, FreshAirEnum,
-                           GeneratorModeEnum, LeftAndRightAirSupplyVectorEnum,
-                           ModeEnum, PortableWind4ValueSeedEnum,
-                           PortableWindSeedEnum, SleepModeEnum,
-                           TemperatureTypeEnum, UpAndDownAirSupplyVectorEnum,
-                           WindFeelingEnum, WindowAcWindSeedEnum,
-                           WindSeed7GearEnum, WindSeedEnum,
-                           WindSpeedLowMediumHigh, getAirPurifierFanWindSpeed,
+                           AirPurifierWorkModeStrEnum, DehumidifierModeEnum,
+                           FreshAirEnum, GeneratorModeEnum,
+                           LeftAndRightAirSupplyVectorEnum, ModeEnum,
+                           PortableWind4ValueSeedEnum, PortableWindSeedEnum,
+                           SleepModeEnum, TemperatureTypeEnum,
+                           UpAndDownAirSupplyVectorEnum, WindFeelingEnum,
+                           WindowAcWindSeedEnum, WindSeed7GearEnum,
+                           WindSeedEnum, WindSpeedLowMediumHigh,
+                           getAirPurifierFanWindSpeed, getAirPurifierWorkMode,
                            getFreshAir, getGeneratorMode,
                            getLeftAndRightAirSupplyVector,
                            getPortableWind4ValueSeed, getPortableWindSeed,
@@ -89,6 +89,8 @@ class DesiredStateHandlerForSelect:
                 return await self.SELECT_TEMPERATURE_TYPE(value=value)
             case DeviceFeatureEnum.SELECT_FRESH_AIR:
                 return await self.SELECT_FRESH_AIR(value=value)
+            case DeviceFeatureEnum.SELECT_WORK_MODE:
+                return await self.SELECT_WORK_MODE(value=value)
 
     def current_state(self) -> str:
         match self.deviceFeature:
@@ -169,6 +171,8 @@ class DesiredStateHandlerForSelect:
                 )
             case DeviceFeatureEnum.SELECT_TEMPERATURE_TYPE:
                 return getTemperatureType(self.device.data.temperature_type)
+            case DeviceFeatureEnum.SELECT_WORK_MODE:
+                return getAirPurifierWorkMode(self.device.data.work_mode)
 
     def options_values(self) -> str:
         match self.deviceFeature:
@@ -203,6 +207,8 @@ class DesiredStateHandlerForSelect:
                 return [e.value for e in LeftAndRightAirSupplyVectorEnum]
             case DeviceFeatureEnum.SELECT_TEMPERATURE_TYPE:
                 return [e.value for e in TemperatureTypeEnum]
+            case DeviceFeatureEnum.SELECT_WORK_MODE:
+                return [e.value for e in AirPurifierWorkModeStrEnum]
 
     async def SELECT_SLEEP_MODE(self, value: SleepModeEnum):
         desired_state = {}
@@ -402,6 +408,31 @@ class DesiredStateHandlerForSelect:
                 desired_state = {"windSpeed": 2}
             case AirPurifierFanWindSpeedStrEnum.HIGH:
                 desired_state = {"windSpeed": 3}
+        return await self.coordinator.get_aws_iot().async_set_desired_state(
+            self.device.device_id, desired_state
+        )
+    
+    async def SELECT_WORK_MODE(self, value: AirPurifierWorkModeStrEnum):
+        stored_data = await get_stored_data(self.hass, self.device.device_id)
+        _LOGGER.info("SELECT_WORK_MODE - stored_data: %s", stored_data)
+        mode = self.device.mode_value_to_enum_mapp.get(
+            self.device.data.work_mode, AirPurifierFanWindSpeedStrEnum.LOW
+        )
+        stored_data, need_save = safe_set_value(
+            stored_data, "fan_speed." + mode + ".value", value, overwrite_if_exists=True
+        )
+        if need_save:
+            await set_stored_data(self.hass, self.device.device_id, stored_data)
+            
+        desired_state = {}
+        _LOGGER.info("Setting SELECT_WORK_MODE to %s", value)
+        match value:
+            case AirPurifierWorkModeStrEnum.AUTO:
+                desired_state = {"workMode": 0}
+            case AirPurifierWorkModeStrEnum.SLEEP:
+                desired_state = {"windSpeed": 0, "workMode": 1}
+            case AirPurifierWorkModeStrEnum.FAN:
+                desired_state = {"windSpeed": 1, "workMode": 2}
         return await self.coordinator.get_aws_iot().async_set_desired_state(
             self.device.device_id, desired_state
         )
@@ -842,6 +873,13 @@ def get_AIR_PURIFIER_BREEVA_FAN_WIND_SPEED_available_fn(device: Device) -> str:
     return mode
 
 
+def get_WORK_MODE_available_fn(device: Device) -> str:
+    _LOGGER.info("Checking work_mode for device %s: %s", device.device_id, device.data.work_mode)
+    mode = device.mode_value_to_enum_mapp.get(device.data.work_mode, AirPurifierWorkModeStrEnum.AUTO)
+    _LOGGER.info("Determined mode for device %s: %s", device.device_id, mode)
+    return mode
+
+
 def get_SELECT_PORTABLE_WIND_SPEED_available_fn(device: Device) -> str:
     if DeviceFeatureEnum.MODE_AC_AUTO in device.supported_features:
         return device.data.sleep != 1
@@ -928,6 +966,22 @@ async def async_setup_entry(
                     )
                 )
         
+        if DeviceFeatureEnum.SELECT_WORK_MODE in device.supported_features:
+            switches.append(
+                DynamicSelectHandler(
+                    hass=hass,
+                    coordinator=coordinator,
+                    device=device,
+                    deviceFeature=DeviceFeatureEnum.SELECT_WORK_MODE,
+                    type="WorkMode",
+                    name="Work Mode",
+                    icon_fn=lambda device: "mdi:air-filter",
+                    options_values_fn=lambda device: [e.value for e in AirPurifierWorkModeStrEnum],
+                    available_fn=lambda device: get_WORK_MODE_available_fn(
+                        device
+                    ),
+                )
+            )
 
         if DeviceFeatureEnum.SELECT_WINDOW_AS_WIND_SPEED in device.supported_features:
             switches.append(
