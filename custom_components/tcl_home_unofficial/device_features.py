@@ -28,6 +28,7 @@ class DeviceFeatureEnum(StrEnum):
     SENSOR_EXTERNAL_UNIT_EXHAUST_TEMPERATURE = "sensor.external_unit_exhaust_temperature"
     SENSOR_FRESH_AIR_TVOC = "sensor.fresh_air.TVOC"
     SENSOR_POWER_CONSUMPTION_DAILY = "sensor.power_consumption.daily"
+    SENSOR_PM25_SENSOR_VALUE = "sensor.PM25SensorValue"
     SENSOR_WORK_TIME_DAILY = "sensor.work_time.daily"
     SWITCH_POWER = "switch.powerSwitch"
     SWITCH_BEEP = "switch.beepSwitch"
@@ -391,6 +392,7 @@ def getSupportedFeatures(
                 DeviceFeatureEnum.SWITCH_POWER,
                 DeviceFeatureEnum.SENSOR_IS_ONLINE,
                 DeviceFeatureEnum.SENSOR_FILTER_LIFETIME,
+                DeviceFeatureEnum.SENSOR_PM25_SENSOR_VALUE,
                 DeviceFeatureEnum.SELECT_WIND_SPEED, 
                 DeviceFeatureEnum.SELECT_WORK_MODE
             ]

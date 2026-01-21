@@ -182,6 +182,22 @@ async def async_setup_entry(
                 )
             )
 
+        
+        if DeviceFeatureEnum.SENSOR_PM25_SENSOR_VALUE in device.supported_features:
+            sensors.append(
+                IntNumberSensor(
+                    coordinator=coordinator,
+                    device=device,
+                    type="PM25SensorValue",
+                    name="PM2.5 Sensor Value",
+                    device_classification=SensorDeviceClass.PM25,
+                    state_classification=SensorStateClass.MEASUREMENT,
+                    native_unit_of_measurement="µg/m³",
+                    icon_fn=lambda device: "mdi:air-filter",
+                    value_fn=lambda device: device.data.pm25_sensor_value,
+                )
+            )
+
     async_add_entities(sensors)
 
 
