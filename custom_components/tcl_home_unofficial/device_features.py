@@ -391,7 +391,7 @@ def getSupportedFeatures(
                 DeviceFeatureEnum.SWITCH_POWER,
                 DeviceFeatureEnum.SENSOR_IS_ONLINE,
                 DeviceFeatureEnum.SELECT_WIND_SPEED, 
-                DeviceFeatureEnum.WORK_MODE
+                DeviceFeatureEnum.SELECT_WORK_MODE
             ]
             
             return features
