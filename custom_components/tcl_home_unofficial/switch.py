@@ -282,9 +282,8 @@ async def async_setup_entry(
                     type="ShieldSwitch",
                     name="Shield Switch",
                     icon_fn=lambda device: (
-                        "mdi:shield-check"
-                        if device.data.shield_switch == 1
-                        else "mdi:shield-off"
+                        "mdi:shield-check" if device.data.power_switch == 1 
+                        else False
                     ),
                     is_on_fn=lambda device: device.data.shield_switch,
                 )
