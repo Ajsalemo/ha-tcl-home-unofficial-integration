@@ -391,7 +391,7 @@ def getSupportedFeatures(
         case DeviceTypeEnum.AIR_PURIFIER_BREEVA_A3 | DeviceTypeEnum.AIR_PURIFIER_BREEVA_A5:
             features = [
                 DeviceFeatureEnum.SWITCH_POWER,
-                DeviceFeatureEnum.SWITCH_SHIELD_SWITCH
+                DeviceFeatureEnum.SWITCH_SHIELD_SWITCH,
                 DeviceFeatureEnum.SENSOR_IS_ONLINE,
                 DeviceFeatureEnum.SENSOR_FILTER_LIFETIME,
                 DeviceFeatureEnum.SENSOR_PM25_SENSOR_VALUE,
