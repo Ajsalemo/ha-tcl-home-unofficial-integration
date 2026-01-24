@@ -130,6 +130,8 @@ class DesiredStateHandlerForSwitch:
                     return False
                 else:
                     return True
+            case DeviceFeatureEnum.SWITCH_SHIELD_SWITCH:
+                return False
             case _:
                 return True
 
@@ -145,13 +147,7 @@ class DesiredStateHandlerForSwitch:
             self.device.device_id, desired_state
         )
 
-    async def SWITCH_SHIELD_SWITCH(self, value: int):
-        # If the device is off, do not allow changing the shield switch
-        # Disble the switch action but keep the saved state of shieldSwitch
-        if self.device.data.power_switch == 0:
-            _LOGGER.info("Device is off. Keeping shield switch state.")
-            return
-        
+    async def SWITCH_SHIELD_SWITCH(self, value: int):        
         _LOGGER.info("Setting shield switch to %s", value)
         desired_state = {"shieldSwitch": value}
         return await self.coordinator.get_aws_iot().async_set_desired_state(
@@ -280,7 +276,7 @@ async def async_setup_entry(
 
         if DeviceFeatureEnum.SWITCH_SHIELD_SWITCH in device.supported_features:
             switches.append(
-                SwitchHandler(
+                DynamicSwitchHandler(
                     hass=hass,
                     coordinator=coordinator,
                     device=device,
