@@ -994,7 +994,7 @@ async def async_setup_entry(
                         ],
                         available_fn=lambda device: (
                             get_AIR_PURIFIER_BREEVA_FAN_WIND_SPEED_available_fn(device)
-                            if device.data.power_switch == 1 or device.data.work_mode != 0
+                            if device.data.power_switch == 1
                             else False
                         ),
                     )
