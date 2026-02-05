@@ -133,6 +133,7 @@ class DesiredStateHandlerForSwitch:
             # If the power switch is off, shield switch cannot be changed
             # The TCL app has this disabled - but still loads the last known state
             # This is close enough to the behavior without writing a whole new switch class
+            # When power is on, it'll load the last known state - so if shield was on, it'll be on
             case DeviceFeatureEnum.SWITCH_SHIELD_SWITCH:
                 if self.device.data.power_switch == 0:
                     return False

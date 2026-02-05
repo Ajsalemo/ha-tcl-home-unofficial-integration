@@ -1,7 +1,4 @@
-import logging
 from enum import StrEnum
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class DeviceTypeEnum(StrEnum):
@@ -47,7 +44,6 @@ def is_implemented_by_integration(device_type: str) -> bool:
 
 
 def calculateDeviceType(device_type: str) -> DeviceTypeEnum | None:
-    _LOGGER.info("Calculating device type for: %s", device_type)
     if device_type == "Portable AC":
         return DeviceTypeEnum.PORTABLE_AC
     elif device_type == "Dehumidifier DEM":

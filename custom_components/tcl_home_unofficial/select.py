@@ -978,7 +978,7 @@ async def async_setup_entry(
             or device.device_type == DeviceTypeEnum.AIR_PURIFIER_BREEVA_A5
         ):
             if DeviceFeatureEnum.SELECT_WIND_SPEED in device.supported_features:
-                # If the power is on, show the wind speed select
+                # If the power is on or the work mode is not 0 (Auto), show the wind speed select
                 # Otherwise, disable the wind speed select
                 switches.append(
                     DynamicSelectHandler(
@@ -994,7 +994,7 @@ async def async_setup_entry(
                         ],
                         available_fn=lambda device: (
                             get_AIR_PURIFIER_BREEVA_FAN_WIND_SPEED_available_fn(device)
-                            if device.data.power_switch == 1
+                            if device.data.power_switch == 1 or device.data.work_mode != 0
                             else False
                         ),
                     )
